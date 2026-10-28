@@ -1,20 +1,14 @@
 from langchain.tools import tool
-from langchain_google_genai import ChatGoogleGenerativeAI
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
+from langchain_openai import ChatOpenAI
+from google_auth_setup import get_sheets_service
 import json
 
-SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-SERVICE_ACCOUNT_FILE = "service_account.json"
+
+
 SPREADSHEET_ID = "1wrItgWsgLmed3PlkaE8nuHEGBdgN20rXJAvDEvWWo1E"
 RANGE_NAME = "PricingSheet!A1:G100"
 
-def get_sheets_service():
-    creds = Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE,
-        scopes=SHEETS_SCOPES
-    )
-    return build("sheets", "v4", credentials=creds)
+
 
 
 @tool
@@ -43,9 +37,9 @@ def pricing_tool(client_request: str):
         padded = row + [""] * (len(headers) - len(row))
         pricing_records.append(dict(zip(headers, padded)))
 
-    # Step 2: Ask Gemini to interpret pricing
-    model = ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
+    # Step 2: Ask OpenAI to interpret pricing
+    model = ChatOpenAI(
+        model="gpt-4.1-mini",
         temperature=0
     )
 
@@ -96,6 +90,9 @@ Instructions:
     response = model.invoke(prompt)
 
     content = response.content
+
+    print(content)
+    '''
    # Convert to plain text
     if isinstance(content, str):
         text = content.strip()
@@ -122,3 +119,7 @@ Instructions:
 
     pricing_result = json.loads(text)
     return json.dumps(pricing_result, indent=2)
+    '''
+
+
+

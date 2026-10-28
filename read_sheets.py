@@ -1,5 +1,5 @@
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
+from langchain_openai import ChatOpenAI
+from google_auth_setup import get_sheets_service
 
 SHEETS_SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 SPREADSHEET_ID = "1wrItgWsgLmed3PlkaE8nuHEGBdgN20rXJAvDEvWWo1E"
@@ -7,16 +7,8 @@ RANGE_NAME = "PricingSheet!A1:G10"
 
 def main():
 
-    creds = Credentials.from_service_account_file(
-        "service_account.json",
-        scopes=SHEETS_SCOPES
-    )
-
-    service = build("sheets", "v4", credentials=creds)
-
-    sheet = service.spreadsheets()
-
-    result = sheet.values().get(
+    sheets_service = get_sheets_service()
+    result = sheets_service.spreadsheets().values().get(
             spreadsheetId=SPREADSHEET_ID,
             range=RANGE_NAME
         ).execute()
